@@ -22,6 +22,7 @@ learning_rate = 1e-1
 epochs = 5
 batch_size = 10
 
+
 # getting MNIST data
 training_data = datasets.MNIST('data', train=True, download=False, transform=ToTensor())
 training_dataloader = DataLoader(training_data, batch_size = batch_size)

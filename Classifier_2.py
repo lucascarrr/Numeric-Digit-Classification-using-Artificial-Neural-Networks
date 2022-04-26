@@ -11,8 +11,8 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
 
 # hyper parameters
-network_layers = [784, 300, 10]
-learning_rate = 1e-1
+network_layers = [784, 500, 10]
+learning_rate = 1e-3
 epochs = 5
 batch_size = 32
 
@@ -79,16 +79,12 @@ class NeuralNetwork(nn.Module):
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(network_layers[0], network_layers[1]),
-            nn.ReLU(),
+            nn.Sigmoid(),
             nn.Linear(network_layers[1], network_layers[1]),
-            nn.ReLU(),
-            # nn.Linear(network_layers[2], network_layers[2]),
-            # nn.ReLU(),
-            # nn.Linear(network_layers[3], network_layers[3]),
-            # nn.ReLU(),
+            nn.Sigmoid(),
             nn.Linear(network_layers[1], network_layers[2]),
-
         )
+
     def forward(self, x):
         x = self.flatten(x)
         logits = self.linear_relu_stack(x)

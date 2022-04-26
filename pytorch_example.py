@@ -71,11 +71,11 @@ class NeuralNetwork(nn.Module):
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28*28, 512),
-            nn.ReLU(),
+            nn.Sigmoid(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.Sigmoid(),
             nn.Linear(512, 10),
-            nn.ReLU()
+            nn.Sigmoid()
         )
 
     def forward(self, x):
@@ -87,7 +87,7 @@ model = NeuralNetwork().to(device)
 print(model)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-1)
 
 epochs = 5
 for t in range(epochs):

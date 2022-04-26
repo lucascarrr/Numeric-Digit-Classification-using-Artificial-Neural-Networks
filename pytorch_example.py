@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 import matplotlib.pyplot as plt
 
 # Download training data from open datasets.
-training_data = datasets.FashionMNIST(
+training_data = datasets.MNIST(
     root="data",
     train=True,
     download=True,
@@ -15,7 +15,7 @@ training_data = datasets.FashionMNIST(
 )
 
 # Download test data from open datasets.
-test_data = datasets.FashionMNIST(
+test_data = datasets.MNIST(
     root="data",
     train=False,
     download=True,

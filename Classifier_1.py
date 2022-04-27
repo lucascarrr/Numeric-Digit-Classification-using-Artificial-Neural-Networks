@@ -5,7 +5,7 @@
         Loss Function: Cross Entropy Loss
         Activation Function: Sigmoid
         Optimizer: SGD
-        Batch Size: 64
+        Batch Size: 100
         Learning Rate: 1e-1 (0.00001)
 """
 
@@ -13,28 +13,27 @@ import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from torchvision import datasets
+from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor, Lambda, Compose
+from PIL import Image
 
 # hyper parameters
-network_layers = [784, 300, 10]
+network_layers = [784, 600, 10]
 learning_rate = 1e-1
 epochs = 1
-batch_size = 64
+batch_size = 100
 
 # getting MNIST data
 training_data = datasets.MNIST('data', train=True, download=False, transform=ToTensor())
-training_dataloader = DataLoader(training_data, batch_size = batch_size)
-
 test_data = datasets.MNIST('data', train=False, download=False, transform=ToTensor())
-test_dataloader = DataLoader(test_data, batch_size = batch_size)
+
+training_dataloader = DataLoader(training_data, batch_size = batch_size, shuffle = True)
+test_dataloader = DataLoader(test_data, batch_size = batch_size,  shuffle = True)
 
 # train network
 def train(dataloader, network, loss_fn, optimizer):
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
-        X, y = X, y
-
         # Compute prediction error
         pred = network(X)
         loss = loss_fn(pred, y)
@@ -55,18 +54,12 @@ def test(dataloader, network):
     test_loss, correct = 0, 0
     with torch.no_grad():
         for X, y in dataloader:
-            X, y = X, y
             pred = network(X)
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= size
     correct /= size
-    print(f"Test Error: \n Error Rate: {(100*(1-correct)):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-
-loader = transforms.Compose()
-
-def image_tester(image_path):
-    
+    print(f"Test Error: \n Accuracy Rate: {(100*(correct)):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 # Define network
 class NeuralNetwork(nn.Module):
@@ -78,7 +71,7 @@ class NeuralNetwork(nn.Module):
             nn.Sigmoid(),
             nn.Linear(network_layers[1], network_layers[1]),
             nn.Sigmoid(),
-            nn.Linear(network_layers[1], network_layers[0]),
+            nn.Linear(network_layers[1], network_layers[2]),
             nn.Sigmoid()
         )
 
@@ -90,10 +83,10 @@ class NeuralNetwork(nn.Module):
 if __name__=='__main__':
     network = NeuralNetwork()
     print(network)
-
+    
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(network.parameters(), lr=learning_rate)
-
+    
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train(training_dataloader, network, loss_fn, optimizer)
@@ -101,7 +94,13 @@ if __name__=='__main__':
 
     response = ""
     while response != "exit":
-        response = input("Please enter a filepath:")+"\n")
+        response = input(("Please enter a filepath/'exit to terminate:")+"\n")
+        img = Image.open(response)
+        convert_to_tensor = transforms.ToTensor()
+        img = convert_to_tensor(img)
+        pred = network(img)
+        print(pred)
+        
 
 
         

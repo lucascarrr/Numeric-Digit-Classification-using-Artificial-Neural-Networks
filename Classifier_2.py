@@ -1,9 +1,15 @@
-# CSC3022 Assignment 4: ANN image classification 
-# Classifier 1 - no optimization. Worst performance expected
-# Lucas Carr    ||  CRRLUC003
-# 25 April 2022
+""" CSC3022 Assignment 4: ANNs
+    CRRLUC003 || Lucas Carr
 
-# Libraries
+    Classifier_2: 
+        Loss Function: Cross Entropy Loss
+        Activation Function: ReLU
+        Optimizer: SGD
+        Batch Size: 100
+        Learning Rate: 1e-1 (0.00001)
+"""
+
+import numpy as np 
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -11,45 +17,27 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
 
 # hyper parameters
-network_layers = [784, 500, 10]
-learning_rate = 1e-3
+network_layers = [784, 600, 10]
+learning_rate = 1e-1
 epochs = 5
 batch_size = 32
 
 # getting MNIST data
-training_data = datasets.MNIST(
-    'data', 
-    train=True, 
-    download=False, 
-    transform=ToTensor(),
-    )
+training_data = datasets.MNIST('data', train=True, download=False, transform=ToTensor())
+test_data = datasets.MNIST('data', train=False, download=False, transform=ToTensor())
 
-training_dataloader = DataLoader(
-    training_data, 
-    batch_size = batch_size,
-)
+training_dataloader = DataLoader(training_data, batch_size = batch_size, shuffle = True)
+test_dataloader = DataLoader(test_data, batch_size = batch_size,  shuffle = True)
 
-test_data = datasets.MNIST(
-    'data', 
-    train=False,
-    download=False,
-    transform=ToTensor(),
-)
-
-test_dataloader = DataLoader(
-    test_data,
-    batch_size = batch_size,
-)
-
-#training
-def train(dataloader, model, loss_fn, optimizer):
+# train network
+def train(dataloader, network, loss_fn, optimizer):
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
-        X, y = X, y
-
-        pred = model(X)
+        # Compute prediction error
+        pred = network(X)
         loss = loss_fn(pred, y)
 
+        # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -58,31 +46,34 @@ def train(dataloader, model, loss_fn, optimizer):
             loss, current = loss.item(), batch * len(X)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
-def test(dataloader, model):
+# test network
+def test(dataloader, network):
     size = len(dataloader.dataset)
-    model.eval()
+    network.eval()
     test_loss, correct = 0, 0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X, y
-            pred = model(X)
+            pred = network(X)
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= size
     correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    print(f"Test Error: \n Accuracy Rate: {(100*(correct)):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    return correct
 
-# model
+# Define network
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(network_layers[0], network_layers[1]),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(network_layers[1], network_layers[1]),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(network_layers[1], network_layers[2]),
+            nn.ReLU(),
         )
 
     def forward(self, x):
@@ -90,16 +81,30 @@ class NeuralNetwork(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-model = NeuralNetwork()
-print (model)
+if __name__=='__main__':
+    network = NeuralNetwork()
+    print(network)
 
-# extra
-loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(network.parameters(), lr=learning_rate)
 
-for e in range(epochs):
-    print(f"Epoch {e+1}\n-------------------------------")
-    train(training_dataloader, model, loss_fn, optimizer)
-    test(test_dataloader, model)
-print("Finished Learning!")
-print("Please enter a filepath to test: ")
+    errors = []
+    
+    for i in range (5):
+        errors_2 = 0
+        for t in range(epochs):
+            print(f"Epoch {t+1}\n-------------------------------")
+            train(training_dataloader, network, loss_fn, optimizer)
+            errors_2 += test(test_dataloader, network)
+
+        errors.append((errors_2)/epochs)
+
+    print (errors/errors.size())
+    response = ""
+    while response != "exit":
+        response = input(("Please enter a filepath/'exit to terminate:")+"\n")
+
+
+        
+
+    

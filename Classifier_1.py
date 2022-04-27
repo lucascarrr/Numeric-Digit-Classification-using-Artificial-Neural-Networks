@@ -2,11 +2,21 @@
     CRRLUC003 || Lucas Carr
 
     Classifier_1: 
-        Loss Function: Cross Entropy Loss
-        Activation Function: Sigmoid
-        Optimizer: SGD
+        Loss Function: Cross-Entropy Loss
+        Activation Function: Sigmoid Activation Function
+        Optimiser: SGD
+        Topology: [784, 500, 10]
+        Learning Rate: 1e-1 (0.1)
+        Weight Initialisation: Random
         Batch Size: 100
-        Learning Rate: 1e-1 (0.00001)
+        Epochs: 20
+
+    Issues here are:
+        - poor accuracy
+        - convergance 
+        - slow
+        - bad at generalizing
+        - something about 500 hidden nodes
 """
 
 import numpy as np 
@@ -18,9 +28,9 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 from PIL import Image
 
 # hyper parameters
-network_layers = [784, 600, 10]
+network_layers = [784, 500, 10]
 learning_rate = 1e-1
-epochs = 1
+epochs = 20
 batch_size = 100
 
 # getting MNIST data
@@ -99,8 +109,8 @@ if __name__=='__main__':
         convert_to_tensor = transforms.ToTensor()
         img = convert_to_tensor(img)
         pred = network(img)
-        print(pred)
-        
+        pred = pred.detach().numpy()
+        print("Classifier: ", np.argmax(pred))
 
 
         

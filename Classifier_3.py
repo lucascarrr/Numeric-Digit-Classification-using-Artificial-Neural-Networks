@@ -1,29 +1,26 @@
 """ CSC3022 Assignment 4: ANNs
     CRRLUC003 || Lucas Carr
 
-    Classifier_2: 
+    Classifier_3: 
         Loss Function: Cross-Entropy Loss
         Activation Function: ReLU
         Optimiser: SGD
-        Topology: [784, 500, 10]
+        Topology: [784, 100, 10]
         Learning Rate: 1e-1 (0.1)
         Weight Initialisation: Random
-        Batch Size: 100
+        Batch Size: 32
         Epochs: 20
     
     Changes:
-        - Activation Function (Sigmoid -> ReLU)
-        
-    Issues:
-        - Improved Accuracy from before
-        - Still bad at learning
-        - Batch Size is too high, which results in bad generalization
-            - Similarly, learning rate is also too high (same effects)
-        - Learning rate too slow
-        - Still too complex
-        - Degredation in ability to generalize (after 4th epoch, begins to overfit)
-"""
+        - Topology ([784, 500, 10] -> [784, 100, 10])
+        - Batch Size (100 -> 32)
 
+    Problems:
+        - Good Accuracy
+        - Too quick to converge
+        - Overfitting Data
+    
+"""
 import numpy as np 
 import torch
 from torch import nn
@@ -33,10 +30,10 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 from PIL import Image
 
 # hyper parameters
-network_layers = [784, 500, 10]
+network_layers = [784, 100, 10]
 learning_rate = 1e-1
 epochs = 20
-batch_size = 100
+batch_size = 32
 
 # getting MNIST data
 training_data = datasets.MNIST('data', train=True, download=False, transform=ToTensor())
@@ -52,6 +49,11 @@ def train(dataloader, network, loss_fn, optimizer):
         # Compute prediction error
         pred = network(X)
         loss = loss_fn(pred, y)
+
+        # l2_lambda = 0.001
+        # l2_norm = sum(p.pow(2.0).sum()
+        #     for p in network.parameters())
+        # loss = loss + l2_lambda * l2_norm
 
         # Backpropagation
         optimizer.zero_grad()
@@ -86,7 +88,7 @@ def test(dataloader, network):
     test_loss /= size
     correct /= size
     print(f"Test Accuracy Rate: {(100*(correct)):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-
+    return correct
 
 # Define network
 class NeuralNetwork(nn.Module):
@@ -99,7 +101,6 @@ class NeuralNetwork(nn.Module):
             nn.Linear(network_layers[1], network_layers[1]),
             nn.ReLU(),
             nn.Linear(network_layers[1], network_layers[2]),
-            nn.ReLU(),
         )
 
     def forward(self, x):

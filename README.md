@@ -6,7 +6,21 @@
 
 ### Lucas Carr || CRRLUC003
 
-#### Files
+#### Files/Program Execution
+
+> **Makefile**
+>
+> Creates the virtual environment for this program. Prior to any other execution, make sure you run the make file, and enter the virtual environment by inputting the following into your terminal:
+>
+> ```shell
+> make	#venv created
+> 
+> source ./venv/bin/activate	#this will activate the virtual environment
+> ```
+
+>**Requirements.txt**
+>
+>File contains the Python libraries for the virtual environment. 
 
 > **models.py** 
 >
@@ -27,7 +41,7 @@
 > Once training and validation are complete, the program will prompt you to enter in an individual MNIST .jpeg file (the path), and return the model’s classification of your file. 
 >
 > ```shell
-> 'Please enter a filepath/'exit' to terminate:
+> 'Please enter a filepath/'exit' to terminate:'
 > 	> some_folder/some_image.jpeg
 > 'Classification: 3'
 > ```

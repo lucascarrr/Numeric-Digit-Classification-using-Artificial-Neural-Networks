@@ -24,6 +24,7 @@ if __name__=='__main__':
         models.Model_3(),
         models.Model_4(),
         models.Model_5(),
+        models.Model_6(),
         ]
 
     model = model_lists[model_number]
@@ -31,8 +32,23 @@ if __name__=='__main__':
 
     print (model.model_name)
     for e in range (model.epochs):
+        print (f"Epoch number {e+1}\n")
         mt.train_model(model, training_data, optimizer)
         mt.validate_model(model, validation_data)
 
+    mt.test_model(model, test_data)
 
+    response = ""
+    while True:
+        response = input(("Please enter a filepath/'exit to terminate:")+"\n")
+        if response == 'exit': exit(0)
+        
+        img = Image.open(response)
+        convert_to_tensor = transforms.ToTensor()
+        img = convert_to_tensor(img)
+
+        model.eval()
+        pred = model(img)
+        pred = pred.detach().numpy()
+        print("Classifier: ", np.argmax(pred))
 

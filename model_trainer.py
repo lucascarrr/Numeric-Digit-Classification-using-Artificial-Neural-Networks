@@ -22,8 +22,8 @@ class model_trainer:
 
             if batch % 100 == 0:
                 loss, current = loss.item(), batch * len(X)
-                print("Loss:", loss, "current:", size)
-    
+                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+
     def validate_model(model, validation_data):
         validation_dataloader = data.DataLoader(validation_data, batch_size = model.batch_size, shuffle = True)
         model.eval()
@@ -42,13 +42,12 @@ class model_trainer:
 
     def test_model(model, test_data):
         test_dataloader = data.DataLoader(test_data, batch_size = model.batch_size,  shuffle = True)
-    
         model.eval()
         size = len(test_dataloader.dataset)
-        model.eval()
+        correct = 0
 
         with torch.no_grad():
-            for X, y in test_dataloader:
+            for X, y in test_data:
                 pred = model(X)
                 correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 

@@ -20,7 +20,7 @@ class model_trainer:
             loss.backward()
             optimizer.step()
 
-            if batch % 100 == 0:
+            if batch % 10 == 0:
                 loss, current = loss.item(), batch * len(X)
                 print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
@@ -53,6 +53,7 @@ class model_trainer:
 
         correct /= size
         print(f"Test Accuracy Rate: {(100*(correct)):>0.1f}")
+        return (100*correct)
 
 
 

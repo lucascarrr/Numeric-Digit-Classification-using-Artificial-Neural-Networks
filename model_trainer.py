@@ -1,13 +1,17 @@
-import numpy as np 
 import torch
-from torch import nn
 import torch.utils.data as data
-from torchvision import datasets, transforms
-from torchvision.transforms import ToTensor
-from PIL import Image
+
+# inspiration taken from:     https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html
 
 class model_trainer:
-    def train_model(model, training_data, optimizer):
+
+    #Used for plotting graphs
+    training_examples_seen = []
+    # loss_values = []
+    # accuracy_values = []
+    # accuracy_values_seen = []
+
+    def train_model(model, training_data, optimizer, iteration):
         training_dataloader = data.DataLoader(training_data, batch_size = model.batch_size, shuffle = True)
         model.train()
         size = len(training_dataloader.dataset)
@@ -20,11 +24,14 @@ class model_trainer:
             loss.backward()
             optimizer.step()
 
-            if batch % 10 == 0:
+            if batch % 100 == 0:
                 loss, current = loss.item(), batch * len(X)
                 print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                # for creating graphs:
+                # model_trainer.training_examples_seen.append((size*iteration) + current)
+                # model_trainer.loss_values.append(loss)
 
-    def validate_model(model, validation_data):
+    def validate_model(model, validation_data, iteration):
         validation_dataloader = data.DataLoader(validation_data, batch_size = model.batch_size, shuffle = True)
         model.eval()
         size = len(validation_dataloader.dataset)
@@ -39,6 +46,9 @@ class model_trainer:
         test_loss /= size
         correct /= size
         print(f"Validation Accuracy Rate: {(100*(correct)):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+        # for creating graphs
+        # model_trainer.accuracy_values_seen.append(48000*iteration)
+        # model_trainer.accuracy_values.append(100*correct)
 
     def test_model(model, test_data):
         test_dataloader = data.DataLoader(test_data, batch_size = model.batch_size,  shuffle = True)
